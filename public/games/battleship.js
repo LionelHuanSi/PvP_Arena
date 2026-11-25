@@ -54,8 +54,44 @@ function randomFleet(fleet, size) {
   }
 }
 
-function grid(size, cls, cellFn) {
-  let html = `<div class="sea ${cls}" style="grid-template-columns: repeat(${size}, 1fr); grid-template-rows: repeat(${size}, 1fr)">`;
+// Lấy vị trí, chiều dài, hướng của tàu từ danh sách ô (tàu từ server chỉ có cells).
+function geom(ship, size) {
+  if (ship.x !== undefined) return ship;
+  const c = [...ship.cells].sort((a, b) => a - b);
+  return { x: c[0] % size, y: Math.floor(c[0] / size), len: c.length, dir: c[1] - c[0] === 1 ? 'h' : 'v' };
+}
+
+// Hình tàu nhìn từ trên xuống, vẽ ngang rồi xoay nếu tàu dọc.
+function shipSvg(len, dir, sunk) {
+  const L = len * 100;
+  const fill = sunk ? '#111' : '#fff';
+  const ink = sunk ? '#fff' : '#111';
+  const hull = `M14 16 H${L - 50} Q${L - 16} 24 ${L - 8} 50 Q${L - 16} 76 ${L - 50} 84 H14 Q4 50 14 16 Z`;
+  const cabin = `<rect x="${L * 0.32}" y="34" width="${Math.max(40, L * 0.22)}" height="32" rx="5" fill="none" stroke="${ink}" stroke-width="6"/>`;
+  let turrets = '';
+  for (let k = 0; k < len; k++) {
+    const cx = 50 + k * 100;
+    if (cx > L * 0.3 && cx < L * 0.32 + Math.max(40, L * 0.22) + 10) continue;
+    turrets += `<circle cx="${cx}" cy="50" r="11" fill="${ink}"/>`;
+  }
+  const body = `<path d="${hull}" fill="${fill}" stroke="#111" stroke-width="6"/>${cabin}${turrets}`;
+  return dir === 'h'
+    ? `<svg viewBox="0 0 ${L} 100" preserveAspectRatio="none">${body}</svg>`
+    : `<svg viewBox="0 0 100 ${L}" preserveAspectRatio="none"><g transform="translate(100 0) rotate(90)">${body}</g></svg>`;
+}
+
+function shipsLayer(ships, size, isSunk = () => false) {
+  return '<div class="ships">' + ships.map((ship) => {
+    const g = geom(ship, size);
+    const w = (g.dir === 'h' ? g.len : 1) * 100 / size;
+    const h = (g.dir === 'v' ? g.len : 1) * 100 / size;
+    const style = `left:${g.x * 100 / size}%;top:${g.y * 100 / size}%;width:${w}%;height:${h}%`;
+    return `<div class="ship" style="${style}">${shipSvg(g.len, g.dir, isSunk(ship))}</div>`;
+  }).join('') + '</div>';
+}
+
+function grid(size, cls, cellFn, layer = '') {
+  let html = `<div class="sea ${cls}" style="grid-template-columns: repeat(${size}, 1fr); grid-template-rows: repeat(${size}, 1fr)">${layer}`;
   for (let i = 0; i < size * size; i++) html += cellFn(i);
   return html + '</div>';
 }
@@ -65,9 +101,8 @@ function renderPlace(el, state, you, api, room) {
   const { size, fleet } = state;
 
   if (state.ready && state.ready[you]) {
-    const own = new Set(state.myShips.flatMap((s) => s.cells));
     el.innerHTML = `<p class="sea-title">${t('bs.yourSea')}</p>` +
-      grid(size, 'small', (i) => `<div class="c ${own.has(i) ? 'ship' : ''}"></div>`);
+      grid(size, 'small', () => '<div class="c"></div>', shipsLayer(state.myShips, size));
     return;
   }
 
@@ -78,7 +113,7 @@ function renderPlace(el, state, you, api, room) {
 
   el.innerHTML = `
     <p class="hint">${left.length ? t('bs.next', { n: left[0] }) : t('bs.allPlaced')}</p>
-    ${grid(size, 'place', (i) => `<button class="c ${owner.has(i) ? 'ship' : ''}" data-i="${i}"></button>`)}
+    ${grid(size, 'place', (i) => `<button class="c" data-i="${i}"></button>`, shipsLayer(draft.ships, size))}
     <div class="tools">
       <button class="small" data-act="dir">${draft.dir === 'h' ? '⇆ ' + t('bs.horizontal') : '⇅ ' + t('bs.vertical')}</button>
       <button class="small" data-act="random">${t('bs.random')}</button>
@@ -122,7 +157,9 @@ function renderBattle(el, state, you, api, room) {
   const myShots = new Map(state.myShots.map((s) => [s.i, s.hit]));
   const sunk = new Set(state.oppShips.flatMap((s) => s.cells));
   const own = new Set(state.myShips.flatMap((s) => s.cells));
+  const oppSunkCells = new Set(state.oppShips.filter((sh) => sh.cells.every((c) => myShots.get(c))).flatMap((sh) => sh.cells));
   const oppShots = new Map(state.oppShots.map((s) => [s.i, s.hit]));
+  const mySunkCells = new Set(state.myShips.filter((sh) => sh.cells.every((c) => oppShots.get(c))).flatMap((sh) => sh.cells));
   const canShoot = !state.over && state.turn === me && you >= 0;
   const popOn = (i, mine) => (fresh && state.last.i === i && (state.last.by === me) === mine ? ' pop' : '');
 
@@ -131,16 +168,16 @@ function renderBattle(el, state, you, api, room) {
     ${grid(size, 'enemy' + (canShoot ? ' active' : ''), (i) => {
       const shot = myShots.has(i);
       let cls = shot ? (myShots.get(i) ? 'hit' : 'miss') : '';
-      if (sunk.has(i)) cls += shot ? ' sunk' : ' ship';
+      if (sunk.has(i)) cls += oppSunkCells.has(i) ? ' onship dark' : ' onship';
       return `<button class="c ${cls}${popOn(i, true)}" data-i="${i}" ${!canShoot || shot ? 'disabled' : ''}>${shot && myShots.get(i) ? HIT : ''}</button>`;
-    })}
+    }, shipsLayer(state.oppShips, size, (ship) => ship.cells.every((c) => myShots.get(c))))}
     <p class="caption">${caption(state.last, me, t)}</p>
     <p class="sea-title">${t('bs.yourSea')} · ${t('bs.left', { n: state.left[0] })}</p>
     ${grid(size, 'small', (i) => {
       const shot = oppShots.has(i);
-      const cls = (own.has(i) ? 'ship' : '') + (shot ? (oppShots.get(i) ? ' hit' : ' miss') : '');
+      const cls = (own.has(i) ? (mySunkCells.has(i) ? 'onship dark' : 'onship') : '') + (shot ? (oppShots.get(i) ? ' hit' : ' miss') : '');
       return `<div class="c ${cls}${popOn(i, false)}">${shot && oppShots.get(i) ? HIT : ''}</div>`;
-    })}`;
+    }, shipsLayer(state.myShips, size, (ship) => ship.cells.every((c) => oppShots.get(c))))}`;
 
   el.querySelectorAll('.sea.enemy .c').forEach((b) => (b.onclick = () => api.send({ shot: +b.dataset.i })));
 }
