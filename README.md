@@ -1,7 +1,6 @@
 # PvP Arena
 
 Chơi game đối kháng online với bạn bè ngay trên trình duyệt.
-Hai người ở hai nơi khác nhau, khác wifi vẫn chơi được.
 
 <p>
   <img src="docs/lobby.png" width="320" alt="Màn hình tạo phòng">
