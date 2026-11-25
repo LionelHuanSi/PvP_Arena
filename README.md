@@ -15,7 +15,7 @@ Play head-to-head games with a friend, right in the browser.
 |---|---|---|
 | Tic-tac-toe | 2 | Take turns. Get three in a row. |
 | Rock Paper Scissors | 2 | Both pick at the same time. Rock beats scissors, scissors beat paper, paper beats rock. |
-| Load, Shield, Shoot | 2 | Both pick at the same time each turn. Load adds a bullet. Shield blocks every shot. Shoot spends a bullet and hits if your opponent is loading. Two shots cancel out. Whoever gets hit loses the round. |
+| Load, Shield, Shoot | 2 | Both pick at the same time each turn. Load adds a bullet. Shield blocks normal shots. Shoot spends a bullet and hits if your opponent is loading. With 5 bullets you can fire a Kamehameha, which no shield can stop. Whoever gets hit loses the round. If both players shoot, or both fire a Kamehameha, the round is a draw. |
 
 When you create a room you pick the match format, such as BO3 or BO5. In a BO5 the first player to win 3 rounds takes the match.
 Rock Paper Scissors also lets you show or hide the move history.

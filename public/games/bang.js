@@ -2,7 +2,8 @@
 import { bangHands, BURST } from './hands.js';
 import { createRevealer } from './reveal.js';
 
-const MOVES = ['load', 'shield', 'shoot'];
+const MOVES = ['load', 'shield', 'shoot', 'kame'];
+const KAME_COST = 5;
 const R = createRevealer();
 let lastAmmo = [0, 0];
 
@@ -19,8 +20,10 @@ export function status(state, you, t) {
 
 function caption(rev, t) {
   const [a, b] = rev.choices;
-  if (rev.hit[0] || rev.hit[1]) return t('bang.hit');
+  if (a === 'kame' && b === 'kame') return t('bang.kameClash');
+  if (a === 'kame' || b === 'kame') return t('bang.kameHit');
   if (a === 'shoot' && b === 'shoot') return t('bang.clash');
+  if (rev.hit[0] || rev.hit[1]) return t('bang.hit');
   if ((a === 'shoot' && b === 'shield') || (b === 'shoot' && a === 'shield')) return t('bang.blocked');
   return '';
 }
@@ -49,11 +52,12 @@ export function render(el, state, you, api, room) {
       <div class="side ${hitCls(opp)}"><div class="hand mirror">${bangHands(shapes[1])}</div><div class="fx">${BURST}</div>${ammoHtml(ammo[opp], t)}</div>
     </div>
     <p class="caption">${shown ? caption(rev, t) : ''}</p>
-    <div class="choices">
+    <div class="choices four">
       ${MOVES.map((m) => {
-        const off = disabled || (m === 'shoot' && state.ammo[me] < 1);
+        const off = disabled || (m === 'shoot' && state.ammo[me] < 1) || (m === 'kame' && state.ammo[me] < KAME_COST);
+        const hint = m === 'kame' && state.ammo[me] < KAME_COST ? `<small>${t('bang.kameHint')}</small>` : '';
         return `<button class="choice wide ${state.mine === m ? 'picked' : ''}" data-m="${m}" ${off ? 'disabled' : ''}>
-          ${bangHands(m)}<span>${t('bang.' + m)}</span></button>`;
+          ${bangHands(m)}<span>${t('bang.' + m)}</span>${hint}</button>`;
       }).join('')}
     </div>`;
 

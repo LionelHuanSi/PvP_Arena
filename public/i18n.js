@@ -27,7 +27,8 @@ const DICT = {
     'opt.showHistory': 'Hiện lịch sử ra tay của đối phương',
     'rps.rock': 'Búa', 'rps.paper': 'Bao', 'rps.scissors': 'Kéo',
     'bang.load': 'Nạp đạn', 'bang.shield': 'Khiên', 'bang.shoot': 'Bắn', 'bang.ammo': 'Đạn',
-    'bang.blocked': 'Đỡ được!', 'bang.clash': 'Hai viên đạn va nhau!', 'bang.hit': 'Trúng đạn!',
+    'bang.blocked': 'Đỡ được!', 'bang.clash': 'Hai viên đạn va nhau, hòa!', 'bang.hit': 'Trúng đạn!',
+    'bang.kame': 'Kamehameha', 'bang.kameHint': 'Cần 5 đạn', 'bang.kameHit': 'Kamehameha! Khiên cũng không đỡ nổi!', 'bang.kameClash': 'Hai Kamehameha triệt tiêu nhau!', 'err.noKame': 'Cần 5 viên đạn để dùng Kamehameha',
   },
   en: {
     yourName: 'Your name', namePh: 'Enter your name', create: 'Create room', game: 'Game',
@@ -48,7 +49,8 @@ const DICT = {
     'opt.showHistory': "Show opponent's move history",
     'rps.rock': 'Rock', 'rps.paper': 'Paper', 'rps.scissors': 'Scissors',
     'bang.load': 'Load', 'bang.shield': 'Shield', 'bang.shoot': 'Shoot', 'bang.ammo': 'Ammo',
-    'bang.blocked': 'Blocked!', 'bang.clash': 'Bullets collided!', 'bang.hit': 'Hit!',
+    'bang.blocked': 'Blocked!', 'bang.clash': 'Bullets collided, draw!', 'bang.hit': 'Hit!',
+    'bang.kame': 'Kamehameha', 'bang.kameHint': 'Needs 5 ammo', 'bang.kameHit': "Kamehameha! Shields can't stop it!", 'bang.kameClash': 'Two Kamehamehas cancel out!', 'err.noKame': 'You need 5 ammo for Kamehameha',
   },
   ja: {
     yourName: 'あなたの名前', namePh: '名前を入力', create: 'ルームを作成', game: 'ゲーム',
@@ -69,7 +71,8 @@ const DICT = {
     'opt.showHistory': '相手の手の履歴を表示',
     'rps.rock': 'グー', 'rps.paper': 'パー', 'rps.scissors': 'チョキ',
     'bang.load': 'チャージ', 'bang.shield': 'ガード', 'bang.shoot': 'バン', 'bang.ammo': '弾',
-    'bang.blocked': 'ガード成功!', 'bang.clash': '弾がぶつかった!', 'bang.hit': '命中!',
+    'bang.blocked': 'ガード成功!', 'bang.clash': '弾がぶつかって引き分け!', 'bang.hit': '命中!',
+    'bang.kame': 'かめはめ波', 'bang.kameHint': '弾5発必要', 'bang.kameHit': 'かめはめ波!ガードできない!', 'bang.kameClash': 'かめはめ波が相殺された!', 'err.noKame': 'かめはめ波には弾が5発必要です',
   },
   ko: {
     yourName: '이름', namePh: '이름 입력', create: '방 만들기', game: '게임',
@@ -90,7 +93,8 @@ const DICT = {
     'opt.showHistory': '상대의 이전 수 기록 표시',
     'rps.rock': '바위', 'rps.paper': '보', 'rps.scissors': '가위',
     'bang.load': '장전', 'bang.shield': '방어', 'bang.shoot': '발사', 'bang.ammo': '총알',
-    'bang.blocked': '막았다!', 'bang.clash': '총알끼리 부딪쳤다!', 'bang.hit': '명중!',
+    'bang.blocked': '막았다!', 'bang.clash': '총알끼리 부딪쳐 무승부!', 'bang.hit': '명중!',
+    'bang.kame': '에네르기파', 'bang.kameHint': '총알 5발 필요', 'bang.kameHit': '에네르기파! 방어 불가!', 'bang.kameClash': '에네르기파끼리 상쇄!', 'err.noKame': '에네르기파는 총알 5발이 필요합니다',
   },
   zh: {
     yourName: '你的名字', namePh: '输入名字', create: '创建房间', game: '游戏',
@@ -111,7 +115,8 @@ const DICT = {
     'opt.showHistory': '显示对手的出招历史',
     'rps.rock': '石头', 'rps.paper': '布', 'rps.scissors': '剪刀',
     'bang.load': '装弹', 'bang.shield': '盾牌', 'bang.shoot': '射击', 'bang.ammo': '子弹',
-    'bang.blocked': '挡住了!', 'bang.clash': '子弹相撞!', 'bang.hit': '命中!',
+    'bang.blocked': '挡住了!', 'bang.clash': '子弹相撞，平局!', 'bang.hit': '命中!',
+    'bang.kame': '龟派气功', 'bang.kameHint': '需要5发子弹', 'bang.kameHit': '龟派气功！盾牌也挡不住！', 'bang.kameClash': '两道龟派气功相互抵消！', 'err.noKame': '使用龟派气功需要5发子弹',
   },
 };
 

@@ -52,7 +52,20 @@ const RIGHT = {
     <path d="M80 14 Q98 44 80 74 M90 22 Q104 44 90 66" ${LINE}/>`,
 };
 
+// Kamehameha: hai bàn tay chụm cổ tay đẩy về phía trước, kèm quả cầu năng lượng.
+const KAME = `
+  <g ${ST}>
+    <rect x="-30" y="34" width="76" height="20"/>
+    <rect x="-30" y="62" width="76" height="20"/>
+    ${r(40, 4, 18, 52)}${r(40, 60, 18, 48)}
+    ${r(30, 30, 12, 26, 'transform="rotate(-25 36 54)"')}${r(30, 60, 12, 26, 'transform="rotate(25 36 62)"')}
+  </g>
+  <path d="M100 22 L104 30 M126 58 H136 M100 94 L104 86 M118 30 L124 24 M118 86 L124 92" ${LINE}/>
+  <circle cx="94" cy="58" r="22" fill="#111"/>
+  <circle cx="94" cy="58" r="10" fill="#fff"/>`;
+
 export function bangHands(right) {
+  if (right === 'kame') return `<svg viewBox="-6 0 140 110">${KAME}</svg>`;
   return `<svg viewBox="-6 0 140 110"><g ${ST}>${BASE}<g class="rh">${RIGHT[right] || FIST}</g></g></svg>`;
 }
 

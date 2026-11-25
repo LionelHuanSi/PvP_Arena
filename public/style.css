@@ -190,7 +190,10 @@ label.check input { width: auto; margin: 0; }
 }
 .choice:hover:not(:disabled) { background: #f2f2f2; }
 .choice svg { width: 44px; height: 52px; }
-.choice.wide svg { width: 72px; height: 56px; }
+.choice.wide svg { width: 64px; height: 50px; }
+.choices.four { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.choices.four .choice { font-size: 13px; padding: 8px 2px; }
+.choice small { font-size: 11px; color: #777; }
 .choice.picked, .choice.picked:hover { box-shadow: inset 0 0 0 3px #111; font-weight: 700; }
 .choice:disabled:not(.picked) { opacity: 0.35; cursor: default; }
 

@@ -1,9 +1,11 @@
 // Nạp đạn - Khiên - Bắn. Mỗi lượt hai người ra tay cùng lúc:
 //   load   : thêm 1 viên đạn
-//   shield : đỡ mọi phát bắn trong lượt này
+//   shield : đỡ phát bắn thường trong lượt này
 //   shoot  : tốn 1 viên đạn, trúng nếu đối thủ đang nạp đạn
-// Hai người cùng bắn thì đạn va nhau, cả hai mất đạn. Ai trúng đạn thì thua ván.
-const MOVES = ['load', 'shield', 'shoot'];
+//   kame   : Kamehameha, cần 5 viên đạn, khiên không đỡ được, thắng ngay
+// Hai người cùng bắn, hoặc cùng Kamehameha, thì hòa và sang ván mới.
+const MOVES = ['load', 'shield', 'shoot', 'kame'];
+const KAME_COST = 5;
 
 module.exports = {
   id: 'bang',
@@ -20,22 +22,30 @@ module.exports = {
     if (!MOVES.includes(c)) return 'badMove';
     if (state.choice[p]) return 'chosen';
     if (c === 'shoot' && state.ammo[p] < 1) return 'noAmmo';
+    if (c === 'kame' && state.ammo[p] < KAME_COST) return 'noKame';
     state.choice[p] = c;
     if (state.choice.includes(null)) return null;
 
     const choices = [...state.choice];
+    const [a, b] = choices;
     const hit = [false, false];
     choices.forEach((c, i) => {
       if (c === 'load') state.ammo[i]++;
       if (c === 'shoot') state.ammo[i]--;
+      if (c === 'kame') state.ammo[i] -= KAME_COST;
     });
-    if (choices[0] === 'shoot' && choices[1] === 'load') hit[1] = true;
-    if (choices[1] === 'shoot' && choices[0] === 'load') hit[0] = true;
+
+    let draw = false;
+    if (a === b && (a === 'kame' || a === 'shoot')) draw = true;
+    else if (a === 'kame') hit[1] = true;
+    else if (b === 'kame') hit[0] = true;
+    else if (a === 'shoot' && b === 'load') hit[1] = true;
+    else if (b === 'shoot' && a === 'load') hit[0] = true;
 
     state.n++;
     state.choice = [null, null];
     state.winner = hit[1] ? 0 : hit[0] ? 1 : null;
-    state.over = state.winner !== null;
+    state.over = draw || state.winner !== null;
     state.reveal = { n: state.n, choices, hit, winner: state.winner };
     return null;
   },
