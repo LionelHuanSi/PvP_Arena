@@ -9,10 +9,8 @@
 </head>
 <body>
   <main>
-    <header>
-      <h1>PvP Arena</h1>
-      <select id="lang" aria-label="Language"></select>
-    </header>
+    <nav id="lang" class="lang" aria-label="Language"></nav>
+    <h1>PvP Arena</h1>
     <p id="conn" class="conn" hidden></p>
 
     <section id="lobby" hidden>
@@ -25,8 +23,8 @@
         <label><span data-i18n="game"></span>
           <select id="game"></select>
         </label>
-        <label><span data-i18n="target"></span>
-          <input id="target" type="number" min="1" max="99" value="3">
+        <label><span data-i18n="format"></span>
+          <span class="bo"><span>BO</span><input id="bo" type="number" min="1" max="99" value="3"></span>
         </label>
         <div id="options"></div>
         <button id="create" data-i18n="create"></button>
@@ -43,10 +41,9 @@
 
     <section id="room" hidden>
       <div class="row">
-        <span><span data-i18n="room"></span> <strong id="room-code"></strong> · <span id="room-game"></span></span>
+        <span><span data-i18n="room"></span> <strong id="room-code"></strong> · <span id="room-game"></span> · <strong id="room-bo"></strong></span>
         <button id="copy" class="small" data-i18n="copyLink"></button>
       </div>
-      <p id="target-info" class="muted"></p>
       <div id="players" class="players"></div>
       <p id="status" class="status"></p>
       <div id="board"></div>

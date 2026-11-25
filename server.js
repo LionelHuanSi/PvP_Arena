@@ -54,6 +54,7 @@ function broadcast(room) {
     names: room.names,
     connected: room.players.map((p) => p !== null),
     score: room.score,
+    bo: room.bo,
     target: room.target,
     options: room.options,
     autoNext: !!game.autoNext,
@@ -105,12 +106,15 @@ const handlers = {
     const game = games[msg.game];
     if (!game) return error(ws, 'noGame');
     leave(ws);
-    const target = Math.min(99, Math.max(1, parseInt(msg.target, 10) || 3));
+    // BOn: thắng khi đạt quá nửa số ván, ví dụ BO5 thì cần 3 điểm.
+    const bo = Math.min(99, Math.max(1, parseInt(msg.bo, 10) || 3));
+    const target = Math.floor(bo / 2) + 1;
     const options = readOptions(game, msg.options);
     const room = {
       code: newCode(),
       game,
       options,
+      bo,
       target,
       players: Array(game.players).fill(null),
       names: Array(game.players).fill(''),
@@ -125,7 +129,7 @@ const handlers = {
     room.names[0] = String(msg.name || '').slice(0, 20);
     rooms.set(room.code, room);
     ws.room = room;
-    console.log(`Tạo phòng ${room.code} (${game.id}, chơi đến ${target})`);
+    console.log(`Tạo phòng ${room.code} (${game.id}, BO${bo})`);
     broadcast(room);
   },
 

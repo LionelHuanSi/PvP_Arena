@@ -13,18 +13,25 @@ main {
   padding: 24px 16px;
 }
 
-header { position: relative; margin-bottom: 20px; }
-h1 { font-size: 24px; margin: 0; text-align: center; }
-#lang {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: auto;
-  margin: 0;
-  padding: 4px 6px;
-  font-size: 13px;
+h1 { font-size: 24px; margin: 0 0 20px; text-align: center; }
+
+/* Chọn ngôn ngữ */
+.lang { display: flex; justify-content: flex-end; gap: 2px; margin-bottom: 4px; }
+.lang button {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 12px;
+  padding: 2px 5px;
+  letter-spacing: 0.05em;
 }
+.lang button:hover:not(:disabled) { background: none; color: #111; }
+.lang button.on { color: #111; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+
+/* Ô nhập BO */
+.bo { display: flex; align-items: stretch; margin-top: 4px; }
+.bo span { display: flex; align-items: center; padding: 0 10px; border: 1px solid #999; border-right: none; font-weight: 700; background: #f2f2f2; }
+.bo input { margin-top: 0; }
 h2 { font-size: 16px; margin: 0 0 12px; }
 
 .muted { color: #777; font-size: 14px; margin: 0; }

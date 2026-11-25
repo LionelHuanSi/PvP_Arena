@@ -17,7 +17,7 @@ Play head-to-head games with a friend, right in the browser.
 | Rock Paper Scissors | 2 | Both pick at the same time. Rock beats scissors, scissors beat paper, paper beats rock. |
 | Load, Shield, Shoot | 2 | Both pick at the same time each turn. Load adds a bullet. Shield blocks every shot. Shoot spends a bullet and hits if your opponent is loading. Two shots cancel out. Whoever gets hit loses the round. |
 
-When you create a room you choose how many points win the match.
+When you create a room you pick the match format, such as BO3 or BO5. In a BO5 the first player to win 3 rounds takes the match.
 Rock Paper Scissors also lets you show or hide the move history.
 
 Hand games play a short "one, two, three" shake before both hands are revealed, just like playing in person.
@@ -59,7 +59,7 @@ It prints a link like `https://something.trycloudflare.com`.
 
 **3. Play:**
 
-1. Open the link, enter your name, pick a game and the target score, then click **Create room**.
+1. Open the link, enter your name, pick a game and the format (BO3, BO5...), then click **Create room**.
 2. Click **Copy invite link** and send it to your friend.
 3. Your friend opens the link, enters a name and clicks **Join room**.
 

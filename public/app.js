@@ -11,13 +11,20 @@ let gameUIKey = null;   // trò + mã phòng của module đang dùng
 let shownScore = null;  // tỉ số đang hiển thị (giữ nguyên khi hiệu ứng chưa chạy xong)
 
 // ---------- Ngôn ngữ ----------
-$('lang').innerHTML = LANGS.map(([code, name]) => `<option value="${code}">${name}</option>`).join('');
-$('lang').value = getLang();
-$('lang').onchange = () => {
-  setLang($('lang').value);
+function renderLang() {
+  $('lang').innerHTML = LANGS.map(([code, name]) =>
+    `<button class="${code === getLang() ? 'on' : ''}" data-lang="${code}" title="${name}">${code.toUpperCase()}</button>`
+  ).join('');
+}
+$('lang').onclick = (e) => {
+  const code = e.target.dataset.lang;
+  if (!code) return;
+  setLang(code);
+  renderLang();
   renderGameSelect();
   if (current) renderRoom();
 };
+renderLang();
 applyI18n();
 
 // ---------- Sảnh ----------
@@ -140,7 +147,7 @@ function renderRoom() {
   show('room');
   $('room-code').textContent = current.code;
   $('room-game').textContent = t('game.' + current.game);
-  $('target-info').textContent = t('firstTo', { n: target });
+  $('room-bo').textContent = 'BO' + current.bo;
 
   // Vẽ bàn chơi trước: module có thể bắt đầu hiệu ứng ra tay (busy).
   gameUI.render($('board'), state, waiting ? -1 : you, api, current);
@@ -168,7 +175,7 @@ function renderRoom() {
 $('create').onclick = () => {
   const options = {};
   document.querySelectorAll('[data-opt]').forEach((el) => (options[el.dataset.opt] = el.checked));
-  sendMsg({ type: 'create', game: $('game').value, name: myName(), target: +$('target').value, options });
+  sendMsg({ type: 'create', game: $('game').value, name: myName(), bo: +$('bo').value, options });
 };
 $('join').onclick = () => sendMsg({ type: 'join', code: $('code').value.trim().toUpperCase(), name: myName() });
 $('code').onkeydown = (e) => e.key === 'Enter' && $('join').click();
