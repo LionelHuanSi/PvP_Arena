@@ -1,10 +1,6 @@
 # PvP Arena
 
-<<<<<<< HEAD
-Chơi game đối kháng online với bạn bè ngay trên trình duyệt.
-=======
 Play head-to-head games with a friend, right in the browser.
->>>>>>> 75e64e2 (Add Rock Paper Scissors and Load-Shield-Shoot, hand reveal animations, target score, i18n (vi/en/ja/ko/zh), English README)
 
 <p>
   <img src="docs/lobby.png" width="200" alt="Lobby">
