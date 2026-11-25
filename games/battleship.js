@@ -1,6 +1,7 @@
 // Bắn tàu trên biển 8x8. Hai giai đoạn:
 //   place  : mỗi người xếp tàu bí mật, gửi { ships: [{ x, y, len, dir: 'h'|'v' }] }
-//   battle : lần lượt bắn, gửi { shot: chỉ số ô }. Ai bắn chìm hết tàu đối thủ trước thì thắng.
+//   battle : lần lượt bắn, gửi { shot: chỉ số ô }. Bắn trúng thì được bắn tiếp, trượt thì mất lượt.
+//            Ai bắn chìm hết tàu đối thủ trước thì thắng.
 // Server chỉ gửi cho mỗi người phần họ được thấy: vị trí tàu đối thủ được giữ kín.
 const SIZE = 8;
 const FLEET = [4, 3, 3, 2];
@@ -86,7 +87,8 @@ module.exports = {
       state.winner = p;
       return null;
     }
-    state.turn = o;
+    // Trúng thì được bắn tiếp, trượt thì mất lượt.
+    if (!target) state.turn = o;
     return null;
   },
 

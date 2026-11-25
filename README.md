@@ -21,7 +21,7 @@ Play head-to-head games with a friend, right in the browser.
 | Gomoku 15x15 | 2 | Take turns on a 15x15 board. Get five in a row. Optional rule: a five blocked at both ends does not count. |
 | Rock Paper Scissors | 2 | Both pick at the same time. Rock beats scissors, scissors beat paper, paper beats rock. |
 | Load, Shield, Shoot | 2 | Both pick at the same time each turn. Load adds a bullet. Shield blocks normal shots. Shoot spends a bullet and hits if your opponent is loading. With 5 bullets you can fire a Kamehameha, which no shield can stop. Whoever gets hit loses the round. If both players shoot, or both fire a Kamehameha, the round is a draw. |
-| Battleship | 2 | Place four ships in secret on an 8x8 sea, then take turns firing. Sink all enemy ships first to win. |
+| Battleship | 2 | Place four ships in secret on an 8x8 sea, then take turns firing. A hit lets you fire again, a miss passes the turn. Sink all enemy ships first to win. |
 
 When you create a room you pick the match format, such as BO3 or BO5. In a BO5 the first player to win 3 rounds takes the match.
 Rock Paper Scissors also lets you show or hide the move history.
