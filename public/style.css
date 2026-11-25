@@ -13,10 +13,21 @@ main {
   padding: 24px 16px;
 }
 
-h1 { font-size: 24px; margin: 0 0 20px; text-align: center; }
+header { position: relative; margin-bottom: 20px; }
+h1 { font-size: 24px; margin: 0; text-align: center; }
+#lang {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  margin: 0;
+  padding: 4px 6px;
+  font-size: 13px;
+}
 h2 { font-size: 16px; margin: 0 0 12px; }
 
-.muted { color: #777; font-size: 14px; margin: 0 0 20px; }
+.muted { color: #777; font-size: 14px; margin: 0; }
 .error { color: #c00; min-height: 1.2em; }
 .status { font-size: 18px; font-weight: 600; min-height: 1.4em; }
 
@@ -47,9 +58,9 @@ button {
   color: #fff;
   cursor: pointer;
 }
-button:hover { background: #333; }
+button:hover:not(:disabled) { background: #333; }
 button.small { padding: 4px 10px; font-size: 14px; background: #fff; color: #111; }
-button.small:hover { background: #eee; }
+button.small:hover:not(:disabled) { background: #eee; }
 
 .row {
   display: flex;
@@ -109,3 +120,79 @@ button.small:hover { background: #eee; }
 .player .score { font-size: 24px; font-weight: 700; }
 
 .ttt button svg { width: 70%; height: 70%; display: block; margin: auto; }
+
+label.check { display: flex; align-items: center; gap: 8px; }
+label.check input { width: auto; margin: 0; }
+
+/* Quân cờ mới đặt */
+.ttt button.pop svg { animation: pop 0.25s ease-out; }
+@keyframes pop { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* ---------- Trò ra tay cùng lúc ---------- */
+.arena {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #ccc;
+  padding: 16px 8px;
+  margin: 8px 0;
+}
+.arena .side { position: relative; flex: 1; text-align: center; transition: opacity 0.3s; }
+.arena .vs { font-weight: 700; color: #999; }
+.arena .hand { width: 100%; max-width: 120px; margin: 0 auto; }
+.arena .hand svg { width: 100%; display: block; }
+.arena.bang .hand { max-width: 170px; }
+.mirror { transform: scaleX(-1); }
+
+/* Lắc tay ba nhịp trước khi lộ ra */
+.arena.shake .hand svg { animation: bump 0.35s ease-in-out 3; }
+.arena.bang.shake .hand svg { animation: none; }
+.arena.bang.shake .rh { animation: bump 0.35s ease-in-out 3; }
+@keyframes bump {
+  0%, 100% { transform: translateY(0); }
+  45% { transform: translateY(-14px); }
+}
+.arena.revealed .hand svg { animation: pop 0.25s ease-out; }
+
+.side.lose { opacity: 0.3; }
+
+/* Trúng đạn */
+.side .fx { display: none; position: absolute; top: 0; left: 50%; width: 64px; margin-left: -32px; }
+.side.hit .fx { display: block; animation: pop 0.25s ease-out; }
+.side.hit .hand { opacity: 0.3; }
+
+.ammo { font-size: 13px; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 3px; }
+.ammo i { width: 7px; height: 14px; background: #111; border-radius: 3px 3px 0 0; display: inline-block; }
+
+.caption { text-align: center; font-weight: 700; min-height: 1.3em; margin: 4px 0; }
+
+/* Nút chọn nước đi */
+.choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 12px 0; }
+.choice {
+  background: #fff;
+  color: #111;
+  border: 1px solid #111;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+.choice:hover:not(:disabled) { background: #f2f2f2; }
+.choice svg { width: 44px; height: 52px; }
+.choice.wide svg { width: 72px; height: 56px; }
+.choice.picked, .choice.picked:hover { box-shadow: inset 0 0 0 3px #111; font-weight: 700; }
+.choice:disabled:not(.picked) { opacity: 0.35; cursor: default; }
+
+/* Lịch sử oẳn tù tì */
+.hist { margin-top: 16px; }
+.hist-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.hist-body { display: flex; gap: 8px; }
+.hist-labels { display: flex; flex-direction: column; justify-content: space-around; font-size: 12px; color: #777; }
+.hist-items { display: flex; flex-wrap: wrap; gap: 4px; }
+.hist-item { display: flex; flex-direction: column; border: 1px solid #ccc; padding: 2px; }
+.hist-item svg { width: 20px; height: 24px; }
+.hist-item.won { border: 2px solid #111; padding: 1px; }
+.hist-item.lost { opacity: 0.45; }

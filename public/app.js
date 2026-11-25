@@ -1,11 +1,26 @@
+import { t, LANGS, getLang, setLang, applyI18n } from '/i18n.js';
+
 const $ = (id) => document.getElementById(id);
 const show = (id) => ['lobby', 'room'].forEach((s) => ($(s).hidden = s !== id));
 
 let ws;
-let current = null;      // trạng thái phòng gần nhất từ server
-let gameUI = null;       // module giao diện của trò đang chơi
-let gameUIId = null;
+let gamesList = [];
+let current = null;     // trạng thái phòng gần nhất từ server
+let gameUI = null;      // module giao diện của trò đang chơi
+let gameUIKey = null;   // trò + mã phòng của module đang dùng
+let shownScore = null;  // tỉ số đang hiển thị (giữ nguyên khi hiệu ứng chưa chạy xong)
 
+// ---------- Ngôn ngữ ----------
+$('lang').innerHTML = LANGS.map(([code, name]) => `<option value="${code}">${name}</option>`).join('');
+$('lang').value = getLang();
+$('lang').onchange = () => {
+  setLang($('lang').value);
+  renderGameSelect();
+  if (current) renderRoom();
+};
+applyI18n();
+
+// ---------- Sảnh ----------
 $('name').value = localStorage.getItem('name') || '';
 const urlRoom = new URLSearchParams(location.search).get('room');
 if (urlRoom) $('code').value = urlRoom.toUpperCase();
@@ -16,6 +31,27 @@ function myName() {
   return n;
 }
 
+function renderGameSelect() {
+  const selected = $('game').value || localStorage.getItem('game');
+  $('game').innerHTML = gamesList.map((g) => `<option value="${g.id}">${t('game.' + g.id)}</option>`).join('');
+  if (gamesList.some((g) => g.id === selected)) $('game').value = selected;
+  renderOptions();
+}
+
+function renderOptions() {
+  const game = gamesList.find((g) => g.id === $('game').value);
+  const opts = game ? Object.entries(game.options) : [];
+  $('options').innerHTML = opts.map(([key, def]) =>
+    `<label class="check"><input type="checkbox" data-opt="${key}" ${def.default ? 'checked' : ''}> ${t('opt.' + key)}</label>`
+  ).join('');
+}
+
+$('game').onchange = () => {
+  localStorage.setItem('game', $('game').value);
+  renderOptions();
+};
+
+// ---------- Kết nối ----------
 function sendMsg(msg) {
   if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg));
 }
@@ -33,7 +69,7 @@ function connect() {
   };
 
   ws.onclose = () => {
-    $('conn').textContent = 'Mất kết nối, đang thử lại...';
+    $('conn').textContent = t('lost');
     $('conn').hidden = false;
     setTimeout(connect, 2000);
   };
@@ -41,72 +77,106 @@ function connect() {
   ws.onmessage = async (e) => {
     const msg = JSON.parse(e.data);
     if (msg.type === 'games') {
-      $('game').innerHTML = msg.games.map((g) => `<option value="${g.id}">${g.name}</option>`).join('');
+      gamesList = msg.games;
+      renderGameSelect();
     } else if (msg.type === 'error') {
-      $('error').textContent = msg.msg;
-      setTimeout(() => ($('error').textContent = ''), 3000);
+      $('error').textContent = t('err.' + msg.code);
+      clearTimeout(ws.errTimer);
+      ws.errTimer = setTimeout(() => ($('error').textContent = ''), 3000);
     } else if (msg.type === 'state') {
-      current = msg;
-      if (gameUIId !== msg.game) {
+      const key = msg.game + ':' + msg.code;
+      if (gameUIKey !== key) {
         gameUI = await import(`/games/${msg.game}.js`);
-        gameUIId = msg.game;
+        gameUI.reset?.();
+        gameUIKey = key;
+        shownScore = null;
       }
+      current = msg;
       history.replaceState(null, '', `?room=${msg.code}`);
       renderRoom();
     }
   };
 }
 
-function label(i) {
-  return current.names[i] || 'Đối thủ';
+// ---------- Phòng chơi ----------
+function nameOf(i) {
+  return current.names[i] || t('player', { n: i + 1 });
 }
 
-function esc(t) {
-  return t.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const api = {
+  t,
+  send: (move) => sendMsg({ type: 'move', move }),
+  rerender: () => current && renderRoom(),
+};
+
+function esc(s) {
+  return s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 }
 
-function renderPlayers() {
-  const { state, you, connected, score } = current;
+function renderPlayers(busy) {
+  const { state, you, connected } = current;
   const waiting = connected.includes(false);
-  $('players').innerHTML = current.names.map((_, i) => {
+  // Thẻ của mình luôn đứng đầu, khớp với bàn tay của mình bên trái.
+  const order = current.names.map((_, i) => i);
+  if (you > 0) order.unshift(...order.splice(you, 1));
+  $('players').innerHTML = order.map((i) => {
     const cls = ['player'];
     if (!connected[i]) cls.push('away');
-    if (!waiting && !state.over && state.turn === i) cls.push('turn');
-    if (state.over && state.winner === i) cls.push('turn');
-    const tag = !connected[i] ? 'Đang chờ...' : i === you ? 'Bạn' : 'Đối thủ';
+    if (!busy && !waiting && !state.over && state.turn === i) cls.push('turn');
+    if (!busy && state.over && state.winner === i) cls.push('turn');
+    let tag = !connected[i] ? t('waiting') : i === you ? t('you') : t('opponent');
+    if (connected[i] && !state.over && state.ready && state.ready[i]) tag += ' · ' + t('ready');
     return `<div class="${cls.join(' ')}">
-      <div class="piece">${gameUI.piece ? gameUI.piece(i) : ''}</div>
-      <div class="info"><div class="pname">${esc(connected[i] ? label(i) : 'Chưa có người')}</div><div class="tag">${tag}</div></div>
-      <div class="score">${score[i]}</div>
+      ${gameUI.piece ? `<div class="piece">${gameUI.piece(i)}</div>` : ''}
+      <div class="info"><div class="pname">${esc(connected[i] ? nameOf(i) : '—')}</div><div class="tag">${tag}</div></div>
+      <div class="score">${shownScore[i]}</div>
     </div>`;
   }).join('');
 }
 
 function renderRoom() {
-  const { state, you, connected, score } = current;
+  const { state, you, connected, score, target } = current;
+  const waiting = connected.includes(false);
   show('room');
   $('room-code').textContent = current.code;
+  $('room-game').textContent = t('game.' + current.game);
+  $('target-info').textContent = t('firstTo', { n: target });
 
-  renderPlayers();
+  // Vẽ bàn chơi trước: module có thể bắt đầu hiệu ứng ra tay (busy).
+  gameUI.render($('board'), state, waiting ? -1 : you, api, current);
+  const busy = gameUI.busy ? gameUI.busy() : false;
+  if (!busy || !shownScore) shownScore = [...score];
+
+  renderPlayers(busy);
 
   let status;
-  if (connected.includes(false)) status = 'Đang chờ đối thủ vào phòng...';
-  else if (state.over && state.winner === null) status = 'Hòa!';
-  else if (state.over) status = state.winner === you ? 'Bạn thắng!' : 'Bạn thua!';
-  else status = state.turn === you ? 'Tới lượt bạn' : `Lượt của ${label(state.turn)}`;
+  if (waiting) status = t('waitOpp');
+  else if (busy) status = t('revealing');
+  else if (current.matchOver) status = score[you] >= target ? t('winMatch') : t('loseMatch');
+  else if (state.over) {
+    status = state.winner === null ? t('draw') : state.winner === you ? t('winRound') : t('loseRound');
+    if (current.autoNext) status += ' ' + t('nextSoon');
+  } else if (gameUI.status) status = gameUI.status(state, you, t);
+  else status = state.turn === you ? t('yourTurn') : t('turnOf', { name: nameOf(state.turn) });
   $('status').textContent = status;
 
-  $('rematch').hidden = !state.over;
-  gameUI.render($('board'), state, connected.includes(false) ? -1 : you, (move) => sendMsg({ type: 'move', move }));
+  const canRematch = !busy && state.over && (current.matchOver || !current.autoNext);
+  $('rematch').hidden = !canRematch;
+  $('rematch').textContent = current.matchOver ? t('newMatch') : t('nextRound');
 }
 
-$('create').onclick = () => sendMsg({ type: 'create', game: $('game').value, name: myName() });
+$('create').onclick = () => {
+  const options = {};
+  document.querySelectorAll('[data-opt]').forEach((el) => (options[el.dataset.opt] = el.checked));
+  sendMsg({ type: 'create', game: $('game').value, name: myName(), target: +$('target').value, options });
+};
 $('join').onclick = () => sendMsg({ type: 'join', code: $('code').value.trim().toUpperCase(), name: myName() });
 $('code').onkeydown = (e) => e.key === 'Enter' && $('join').click();
 $('rematch').onclick = () => sendMsg({ type: 'rematch' });
 $('leave').onclick = () => {
   sendMsg({ type: 'leave' });
   current = null;
+  gameUIKey = null;
   history.replaceState(null, '', '/');
   show('lobby');
 };
@@ -114,11 +184,11 @@ $('copy').onclick = async () => {
   const link = `${location.origin}/?room=${current.code}`;
   try {
     await navigator.clipboard.writeText(link);
-    $('copy').textContent = 'Đã sao chép!';
+    $('copy').textContent = t('copied');
   } catch {
-    prompt('Sao chép link này:', link);
+    prompt(t('copyPrompt'), link);
   }
-  setTimeout(() => ($('copy').textContent = 'Sao chép link mời'), 1500);
+  setTimeout(() => ($('copy').textContent = t('copyLink')), 1500);
 };
 
 connect();

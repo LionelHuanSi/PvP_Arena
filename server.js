@@ -22,8 +22,10 @@ const server = http.createServer((req, res) => {
 });
 
 // ---------- Phòng chơi ----------
-// room = { code, game, players: [ws|null, ...], names: [], state, starter, score: [] }
+// room = { code, game, options, target, players: [ws|null], names, score, starter,
+//          round, state, matchOver, timer }
 const rooms = new Map();
+const NEXT_DELAY = 3000; // ms chờ trước khi tự bắt đầu ván mới, đủ để client chạy hiệu ứng
 
 function newCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -38,17 +40,34 @@ function send(ws, msg) {
   if (ws && ws.readyState === ws.OPEN) ws.send(JSON.stringify(msg));
 }
 
+function error(ws, code) {
+  send(ws, { type: 'error', code });
+}
+
 function broadcast(room) {
+  const { game } = room;
   room.players.forEach((ws, i) => send(ws, {
     type: 'state',
     you: i,
-    game: room.game.id,
+    game: game.id,
     code: room.code,
     names: room.names,
     connected: room.players.map((p) => p !== null),
     score: room.score,
-    state: room.state,
+    target: room.target,
+    options: room.options,
+    autoNext: !!game.autoNext,
+    matchOver: room.matchOver,
+    round: room.round,
+    state: game.view ? game.view(room.state, i, room.options) : room.state,
   }));
+}
+
+function startRound(room, keepHistory) {
+  clearTimeout(room.timer);
+  room.starter = (room.starter + 1) % room.players.length; // đổi người đi trước
+  room.round++;
+  room.state = room.game.init(room.starter, keepHistory ? room.state : null, room.options);
 }
 
 function leave(ws) {
@@ -58,6 +77,7 @@ function leave(ws) {
   if (i !== -1) room.players[i] = null;
   ws.room = null;
   if (room.players.every((p) => p === null)) {
+    clearTimeout(room.timer);
     rooms.delete(room.code);
     console.log(`Đóng phòng ${room.code}`);
   } else {
@@ -65,61 +85,96 @@ function leave(ws) {
   }
 }
 
+function readOptions(game, input = {}) {
+  const out = {};
+  for (const [key, def] of Object.entries(game.options || {})) {
+    out[key] = def.type === 'bool' ? (key in input ? !!input[key] : def.default) : def.default;
+  }
+  return out;
+}
+
 const handlers = {
   hello(ws) {
-    send(ws, { type: 'games', games: Object.values(games).map((g) => ({ id: g.id, name: g.name })) });
+    send(ws, {
+      type: 'games',
+      games: Object.values(games).map((g) => ({ id: g.id, options: g.options || {} })),
+    });
   },
 
   create(ws, msg) {
     const game = games[msg.game];
-    if (!game) return send(ws, { type: 'error', msg: 'Trò chơi không tồn tại' });
+    if (!game) return error(ws, 'noGame');
     leave(ws);
+    const target = Math.min(99, Math.max(1, parseInt(msg.target, 10) || 3));
+    const options = readOptions(game, msg.options);
     const room = {
       code: newCode(),
       game,
+      options,
+      target,
       players: Array(game.players).fill(null),
       names: Array(game.players).fill(''),
       score: Array(game.players).fill(0),
       starter: 0,
-      state: game.init(0),
+      round: 1,
+      state: game.init(0, null, options),
+      matchOver: false,
+      timer: null,
     };
     room.players[0] = ws;
-    room.names[0] = String(msg.name || 'Người chơi 1').slice(0, 20);
+    room.names[0] = String(msg.name || '').slice(0, 20);
     rooms.set(room.code, room);
     ws.room = room;
-    console.log(`Tạo phòng ${room.code} (${game.name})`);
+    console.log(`Tạo phòng ${room.code} (${game.id}, chơi đến ${target})`);
     broadcast(room);
   },
 
   join(ws, msg) {
     const room = rooms.get(String(msg.code || '').toUpperCase());
-    if (!room) return send(ws, { type: 'error', msg: 'Không tìm thấy phòng' });
+    if (!room) return error(ws, 'noRoom');
     if (room === ws.room) return;
     const slot = room.players.indexOf(null);
-    if (slot === -1) return send(ws, { type: 'error', msg: 'Phòng đã đủ người' });
+    if (slot === -1) return error(ws, 'full');
     leave(ws);
     room.players[slot] = ws;
-    room.names[slot] = String(msg.name || `Người chơi ${slot + 1}`).slice(0, 20);
+    room.names[slot] = String(msg.name || '').slice(0, 20);
     ws.room = room;
-    console.log(`Vào phòng ${room.code}: ${room.names[slot]}`);
+    console.log(`Vào phòng ${room.code}: ${room.names[slot] || '(không tên)'}`);
     broadcast(room);
   },
 
   move(ws, msg) {
     const room = ws.room;
     if (!room) return;
-    if (room.players.includes(null)) return send(ws, { type: 'error', msg: 'Đang chờ đối thủ' });
+    if (room.players.includes(null)) return error(ws, 'waitOpp');
+    if (room.matchOver) return error(ws, 'over');
     const err = room.game.move(room.state, room.players.indexOf(ws), msg.move);
-    if (err) return send(ws, { type: 'error', msg: err });
-    if (room.state.over && room.state.winner !== null) room.score[room.state.winner]++;
+    if (err) return error(ws, err);
+
+    const { state } = room;
+    if (state.over) {
+      if (state.winner !== null && ++room.score[state.winner] >= room.target) room.matchOver = true;
+      if (!room.matchOver && room.game.autoNext) {
+        room.timer = setTimeout(() => {
+          if (rooms.get(room.code) !== room) return;
+          startRound(room, true);
+          broadcast(room);
+        }, NEXT_DELAY);
+      }
+    }
     broadcast(room);
   },
 
   rematch(ws) {
     const room = ws.room;
     if (!room || !room.state.over) return;
-    room.starter = (room.starter + 1) % room.players.length; // đổi người đi trước
-    room.state = room.game.init(room.starter);
+    if (room.matchOver) {
+      room.score.fill(0);
+      room.matchOver = false;
+      startRound(room, false);
+    } else {
+      startRound(room, true);
+    }
     broadcast(room);
   },
 

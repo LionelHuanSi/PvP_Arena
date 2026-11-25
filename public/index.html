@@ -1,49 +1,58 @@
 <!doctype html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PvP Arena</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <main>
-    <h1>PvP Arena</h1>
+    <header>
+      <h1>PvP Arena</h1>
+      <select id="lang" aria-label="Language"></select>
+    </header>
     <p id="conn" class="conn" hidden></p>
 
     <section id="lobby" hidden>
-      <label>Tên của bạn
-        <input id="name" maxlength="20" placeholder="Nhập tên">
+      <label><span data-i18n="yourName"></span>
+        <input id="name" maxlength="20" data-i18n-ph="namePh">
       </label>
 
       <div class="box">
-        <h2>Tạo phòng</h2>
-        <label>Trò chơi
+        <h2 data-i18n="create"></h2>
+        <label><span data-i18n="game"></span>
           <select id="game"></select>
         </label>
-        <button id="create">Tạo phòng</button>
+        <label><span data-i18n="target"></span>
+          <input id="target" type="number" min="1" max="99" value="3">
+        </label>
+        <div id="options"></div>
+        <button id="create" data-i18n="create"></button>
       </div>
 
       <div class="box">
-        <h2>Vào phòng</h2>
-        <label>Mã phòng
-          <input id="code" maxlength="4" placeholder="VD: AB3K">
+        <h2 data-i18n="join"></h2>
+        <label><span data-i18n="roomCode"></span>
+          <input id="code" maxlength="4" data-i18n-ph="codePh">
         </label>
-        <button id="join">Vào phòng</button>
+        <button id="join" data-i18n="join"></button>
       </div>
     </section>
 
     <section id="room" hidden>
       <div class="row">
-        <span>Phòng <strong id="room-code"></strong></span>
-        <button id="copy" class="small">Sao chép link mời</button>
+        <span><span data-i18n="room"></span> <strong id="room-code"></strong> · <span id="room-game"></span></span>
+        <button id="copy" class="small" data-i18n="copyLink"></button>
       </div>
+      <p id="target-info" class="muted"></p>
       <div id="players" class="players"></div>
       <p id="status" class="status"></p>
       <div id="board"></div>
       <div class="row">
-        <button id="rematch" hidden>Chơi ván mới</button>
-        <button id="leave" class="small">Rời phòng</button>
+        <button id="rematch" hidden></button>
+        <button id="leave" class="small" data-i18n="leave"></button>
       </div>
     </section>
 
