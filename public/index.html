@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PvP Arena</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main>
+    <h1>PvP Arena</h1>
+    <p id="conn" class="conn" hidden></p>
+
+    <section id="lobby" hidden>
+      <label>Tên của bạn
+        <input id="name" maxlength="20" placeholder="Nhập tên">
+      </label>
+
+      <div class="box">
+        <h2>Tạo phòng</h2>
+        <label>Trò chơi
+          <select id="game"></select>
+        </label>
+        <button id="create">Tạo phòng</button>
+      </div>
+
+      <div class="box">
+        <h2>Vào phòng</h2>
+        <label>Mã phòng
+          <input id="code" maxlength="4" placeholder="VD: AB3K">
+        </label>
+        <button id="join">Vào phòng</button>
+      </div>
+    </section>
+
+    <section id="room" hidden>
+      <div class="row">
+        <span>Phòng <strong id="room-code"></strong></span>
+        <button id="copy" class="small">Sao chép link mời</button>
+      </div>
+      <div id="players" class="players"></div>
+      <p id="status" class="status"></p>
+      <div id="board"></div>
+      <div class="row">
+        <button id="rematch" hidden>Chơi ván mới</button>
+        <button id="leave" class="small">Rời phòng</button>
+      </div>
+    </section>
+
+    <p id="error" class="error"></p>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
