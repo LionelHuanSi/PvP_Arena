@@ -1,45 +1,64 @@
 # PvP Arena
 
-Chơi game đối kháng online với bạn bè, khác mạng vẫn chơi được.
+Chơi game đối kháng online với bạn bè ngay trên trình duyệt.
+Hai người ở hai nơi khác nhau, khác wifi vẫn chơi được.
 
-## Chơi với bạn
+<p>
+  <img src="docs/lobby.png" width="320" alt="Màn hình tạo phòng">
+  <img src="docs/game.png" width="320" alt="Màn hình ván đấu">
+</p>
+
+## Các trò chơi
+
+| Trò | Số người | Luật |
+|---|---|---|
+| Caro 3x3 | 2 | Ai xếp được 3 quân thẳng hàng trước thì thắng |
+
+Sẽ thêm: Caro 15x15, Connect 4, Bắn tàu, Cờ vua...
+
+## Cài đặt
+
+Cần có [Node.js](https://nodejs.org) (bản 18 trở lên).
 
 ```bash
-npm install          # chỉ cần lần đầu
-npm start            # chạy server ở http://localhost:3000
+git clone https://github.com/LionelHuanSi/PvP_Arena.git
+cd PvP_Arena
+npm install
 ```
 
-Mở terminal thứ hai để tạo link công khai:
+Cài thêm Cloudflare Tunnel để bạn bè ở xa vào được (chỉ cần làm một lần):
 
 ```bash
-brew install cloudflared                        # chỉ cần lần đầu
+brew install cloudflared        # macOS
+winget install Cloudflare.cloudflared   # Windows
+```
+
+## Cách chơi
+
+**1. Chạy game** (người làm chủ phòng làm bước này):
+
+```bash
+npm start
+```
+
+**2. Mở một terminal khác và tạo link công khai:**
+
+```bash
 cloudflared tunnel --url http://localhost:3000
 ```
 
-Terminal sẽ in ra link dạng `https://xxx.trycloudflare.com`.
-Bạn mở link đó, tạo phòng, bấm "Sao chép link mời" rồi gửi cho bạn của bạn.
+Terminal sẽ in ra một link dạng `https://xxx.trycloudflare.com`.
 
-## Thêm trò chơi mới
+**3. Vào chơi:**
 
-1. Tạo `games/<ten-tro>.js` chứa luật: `id`, `name`, `players`, `init(firstPlayer)`, `move(state, player, move)`.
-   Trạng thái phải có `turn`, `over`, `winner`. Xem `games/tictactoe.js` làm mẫu.
-2. Tạo `public/games/<ten-tro>.js` chứa giao diện: hàm `render(container, state, you, sendMove)`.
-3. Thêm `require('./<ten-tro>')` vào `games/index.js`.
+1. Mở link vừa có, nhập tên, chọn trò rồi bấm **Tạo phòng**.
+2. Bấm **Sao chép link mời** và gửi cho bạn của bạn.
+3. Bạn của bạn mở link, nhập tên rồi bấm **Vào phòng**.
 
-Phần mạng và phòng chơi không cần sửa.
+Sau mỗi ván, bấm **Chơi ván mới** để đấu tiếp. Người đi trước sẽ đổi luân phiên, tỉ số được giữ lại.
 
-## Giao thức
+## Lưu ý
 
-Client và server trao đổi JSON qua WebSocket.
-
-| Client gửi | Ý nghĩa |
-|---|---|
-| `{type:"create", game, name}` | Tạo phòng |
-| `{type:"join", code, name}` | Vào phòng |
-| `{type:"move", move}` | Đi một nước |
-| `{type:"rematch"}` | Ván mới, đổi người đi trước |
-| `{type:"leave"}` | Rời phòng |
-
-Server gửi `{type:"state", ...}` cho mọi người trong phòng sau mỗi thay đổi,
-và `{type:"error", msg}` khi nước đi không hợp lệ.
-Server kiểm tra mọi nước đi nên không ai gian lận được từ trình duyệt.
+- Giữ cả hai cửa sổ terminal mở trong lúc chơi.
+- Mỗi lần chạy lại `cloudflared`, link sẽ đổi. Nhớ gửi link mới cho bạn.
+- Nếu chỉ chơi trong cùng wifi, có thể bỏ qua bước 2 và mở `http://<IP-máy-bạn>:3000`.
