@@ -210,13 +210,15 @@ setInterval(() => {
   });
 }, 25000);
 
-server.on('error', (err) => {
+function onListenError(err) {
   if (err.code === 'EADDRINUSE') {
     console.error(`Cổng ${PORT} đang bị chiếm, có thể do server cũ vẫn chạy.`);
     console.error(`Tắt nó bằng: kill $(lsof -ti :${PORT})   hoặc chạy cổng khác: PORT=3001 npm start`);
     process.exit(1);
   }
   throw err;
-});
+}
+server.on('error', onListenError);
+wss.on('error', onListenError);
 
 server.listen(PORT, () => console.log(`Server chạy tại http://localhost:${PORT}`));
