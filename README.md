@@ -1,4 +1,4 @@
-# NetChess
+# PvP Arena
 
 Chơi game đối kháng online với bạn bè, khác mạng vẫn chơi được.
 
