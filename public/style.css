@@ -14,6 +14,7 @@ main {
 }
 
 h1 { font-size: 24px; margin: 0 0 20px; text-align: center; }
+h2.subtitle { font-size: 17px; font-weight: 600; text-align: center; margin: -14px 0 16px; color: #555; }
 
 /* Chọn ngôn ngữ */
 .lang { display: flex; justify-content: flex-end; gap: 2px; margin-bottom: 4px; }
@@ -66,7 +67,7 @@ button {
   cursor: pointer;
 }
 button:hover:not(:disabled) { background: #333; }
-button.small { padding: 4px 10px; font-size: 14px; background: #fff; color: #111; }
+button.small { padding: 4px 10px; font-size: 14px; white-space: nowrap; background: #fff; color: #111; }
 button.small:hover:not(:disabled) { background: #eee; }
 
 .row {
