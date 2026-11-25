@@ -163,8 +163,10 @@ function renderRoom() {
   else if (state.over) {
     status = state.winner === null ? t('draw') : state.winner === you ? t('winRound') : t('loseRound');
     if (current.autoNext) status += ' ' + t('nextSoon');
-  } else if (gameUI.status) status = gameUI.status(state, you, t);
-  else status = state.turn === you ? t('yourTurn') : t('turnOf', { name: nameOf(state.turn) });
+  } else {
+    status = gameUI.status ? gameUI.status(state, you, t) : null;
+    if (!status) status = state.turn === you ? t('yourTurn') : t('turnOf', { name: nameOf(state.turn) });
+  }
   $('status').textContent = status;
 
   const canRematch = !busy && state.over && (current.matchOver || !current.autoNext);
@@ -189,6 +191,12 @@ $('leave').onclick = () => {
 };
 $('copy').onclick = async () => {
   const link = `${location.origin}/?room=${current.code}`;
+  const text = t('shareText', { game: t('game.' + current.game) });
+  // Trên điện thoại: mở bảng chia sẻ (Messenger, Zalo...). Trên máy tính: sao chép link.
+  if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+    try { await navigator.share({ title: 'PvP Arena', text, url: link }); } catch {}
+    return;
+  }
   try {
     await navigator.clipboard.writeText(link);
     $('copy').textContent = t('copied');

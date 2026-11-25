@@ -207,3 +207,63 @@ label.check input { width: auto; margin: 0; }
 .hist-item svg { width: 20px; height: 24px; }
 .hist-item.won { border: 2px solid #111; padding: 1px; }
 .hist-item.lost { opacity: 0.45; }
+
+/* ---------- Caro 15x15 ---------- */
+.gomoku {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1;
+  margin: 12px auto;
+  border: 2px solid #111;
+  background: #fff;
+}
+.gomoku button {
+  border: 0.5px solid #bbb;
+  background: #fff;
+  color: #111;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.gomoku button:hover:not(:disabled) { background: #eee; }
+.gomoku button:disabled { cursor: default; }
+.gomoku button svg { width: 80%; height: 80%; display: block; margin: auto; }
+.gomoku button.last { box-shadow: inset 0 0 0 2px #111; }
+.gomoku button.win { background: #111; color: #fff; }
+.gomoku button.pop svg { animation: pop 0.25s ease-out; }
+
+/* ---------- Bắn tàu ---------- */
+.sea-title { font-size: 14px; font-weight: 600; margin: 12px 0 6px; }
+.hint { font-size: 14px; color: #555; margin: 8px 0; }
+.sea {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 2px solid #111;
+}
+.sea.small { width: 60%; margin: 0 auto 0 0; }
+.sea .c {
+  border: 0.5px solid #ccc;
+  background: #fff;
+  color: #111;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sea button.c:hover:not(:disabled) { background: #eee; }
+.sea.enemy.active { border-width: 3px; }
+.sea .c:disabled { cursor: default; }
+.sea .c.ship { background: #bbb; }
+.sea .c.miss::after { content: ''; width: 22%; aspect-ratio: 1; border-radius: 50%; background: #111; }
+.sea .c.hit { background: #555; color: #fff; }
+.sea .c.hit.sunk, .sea.small .c.ship.hit { background: #111; }
+.sea .c svg { width: 70%; height: 70%; }
+.sea .c.pop { animation: pop 0.3s ease-out; }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; align-items: center; }
+.tools button:last-child { margin-left: auto; }
