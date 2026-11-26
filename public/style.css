@@ -33,6 +33,7 @@ h2.subtitle { font-size: 17px; font-weight: 600; text-align: center; margin: -14
 .bo { display: flex; align-items: stretch; margin-top: 4px; }
 .bo span { display: flex; align-items: center; padding: 0 10px; border: 1px solid #999; border-right: none; font-weight: 700; background: #f2f2f2; }
 .bo input { margin-top: 0; }
+#code { text-transform: uppercase; }
 h2 { font-size: 16px; margin: 0 0 12px; }
 
 .muted { color: #777; font-size: 14px; margin: 0; }
@@ -245,7 +246,7 @@ label.check input { width: auto; margin: 0; }
   background: #fff;
 }
 .sea.small { width: 60%; margin: 0 auto 0 0; }
-.sea .ships { position: absolute; inset: 0; pointer-events: none; }
+.sea .ships { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 .sea .ship { position: absolute; }
 .sea .ship svg { width: 100%; height: 100%; display: block; }
 .sea .c {
@@ -257,7 +258,6 @@ label.check input { width: auto; margin: 0; }
   min-height: 0;
   overflow: hidden;
   position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -265,13 +265,15 @@ label.check input { width: auto; margin: 0; }
 .sea button.c:hover:not(:disabled) { background: rgba(0, 0, 0, 0.08); }
 .sea.enemy.active { border-width: 3px; }
 .sea .c:disabled { cursor: default; }
-.sea .c.miss::after { content: ''; width: 22%; aspect-ratio: 1; border-radius: 50%; background: #111; }
+.sea .c.miss::after { content: ''; position: relative; z-index: 2; width: 22%; aspect-ratio: 1; border-radius: 50%; background: #111; }
 /* Trúng nhưng chưa thấy tàu (biển đối thủ): ô xám đậm. Trúng lên hình tàu: chỉ vẽ dấu X. */
 .sea .c.hit { background: #555; color: #fff; }
 .sea .c.hit.onship { background: transparent; }
 .sea .c.hit.onship svg { width: 62%; height: 62%; background: #111; color: #fff; border-radius: 50%; box-shadow: 0 0 0 2px #fff; }
 .sea .c.hit.onship.dark svg { background: #fff; color: #111; box-shadow: 0 0 0 2px #111; }
-.sea .c svg { width: 70%; height: 70%; }
+.sea .c svg { position: relative; z-index: 2; width: 70%; height: 70%; }
 .sea .c.pop { animation: pop 0.3s ease-out; }
-.tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; align-items: center; }
+.tools { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; align-items: stretch; }
+.tools button { line-height: 1.2; }
+.tools button[data-act="dir"] { min-width: 72px; }
 .tools button:last-child { margin-left: auto; }

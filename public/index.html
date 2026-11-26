@@ -24,7 +24,7 @@
           <select id="game"></select>
         </label>
         <label><span data-i18n="format"></span>
-          <span class="bo"><span>BO</span><input id="bo" type="number" min="1" max="99" value="3"></span>
+          <span class="bo"><span>BO</span><input id="bo" type="number" min="1" max="99" step="2" value="3"></span>
         </label>
         <div id="options"></div>
         <button id="create" data-i18n="create"></button>
@@ -33,7 +33,7 @@
       <div class="box">
         <h2 data-i18n="join"></h2>
         <label><span data-i18n="roomCode"></span>
-          <input id="code" maxlength="4" data-i18n-ph="codePh">
+          <input id="code" maxlength="4" autocomplete="off" autocapitalize="characters" spellcheck="false" data-i18n-ph="codePh">
         </label>
         <button id="join" data-i18n="join"></button>
       </div>

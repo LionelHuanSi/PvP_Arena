@@ -53,6 +53,13 @@ function renderOptions() {
   ).join('');
 }
 
+function oddBo(v) {
+  let n = Math.min(99, Math.max(1, parseInt(v, 10) || 3));
+  if (n % 2 === 0) n += 1;
+  return Math.min(n, 99);
+}
+$('bo').addEventListener('change', () => ($('bo').value = oddBo($('bo').value)));
+
 $('game').onchange = () => {
   localStorage.setItem('game', $('game').value);
   renderOptions();
@@ -177,10 +184,12 @@ function renderRoom() {
 $('create').onclick = () => {
   const options = {};
   document.querySelectorAll('[data-opt]').forEach((el) => (options[el.dataset.opt] = el.checked));
-  sendMsg({ type: 'create', game: $('game').value, name: myName(), bo: +$('bo').value, options });
+  sendMsg({ type: 'create', game: $('game').value, name: myName(), bo: oddBo($('bo').value), options });
 };
 $('join').onclick = () => sendMsg({ type: 'join', code: $('code').value.trim().toUpperCase(), name: myName() });
-$('code').onkeydown = (e) => e.key === 'Enter' && $('join').click();
+$('code').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') $('join').click();
+});
 $('rematch').onclick = () => sendMsg({ type: 'rematch' });
 $('leave').onclick = () => {
   sendMsg({ type: 'leave' });

@@ -107,7 +107,8 @@ const handlers = {
     if (!game) return error(ws, 'noGame');
     leave(ws);
     // BOn: thắng khi đạt quá nửa số ván, ví dụ BO5 thì cần 3 điểm.
-    const bo = Math.min(99, Math.max(1, parseInt(msg.bo, 10) || 3));
+    let bo = Math.min(99, Math.max(1, parseInt(msg.bo, 10) || 3));
+    if (bo % 2 === 0) bo += 1; // BO luôn là số lẻ để không có hòa trận
     const target = Math.floor(bo / 2) + 1;
     const options = readOptions(game, msg.options);
     const room = {

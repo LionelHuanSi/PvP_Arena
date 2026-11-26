@@ -67,12 +67,17 @@ function shipSvg(len, dir, sunk) {
   const fill = sunk ? '#111' : '#fff';
   const ink = sunk ? '#fff' : '#111';
   const hull = `M14 16 H${L - 50} Q${L - 16} 24 ${L - 8} 50 Q${L - 16} 76 ${L - 50} 84 H14 Q4 50 14 16 Z`;
-  const cabin = `<rect x="${L * 0.32}" y="34" width="${Math.max(40, L * 0.22)}" height="32" rx="5" fill="none" stroke="${ink}" stroke-width="6"/>`;
+  const cabX = L * 0.32;
+  const cabW = Math.max(40, L * 0.22);
+  const cabin = `<rect x="${cabX}" y="34" width="${cabW}" height="32" rx="5" fill="none" stroke="${ink}" stroke-width="6"/>`;
   let turrets = '';
   for (let k = 0; k < len; k++) {
     const cx = 50 + k * 100;
-    if (cx > L * 0.3 && cx < L * 0.32 + Math.max(40, L * 0.22) + 10) continue;
-    turrets += `<circle cx="${cx}" cy="50" r="11" fill="${ink}"/>`;
+    // Bỏ tháp pháo nào chạm buồng lái hoặc mũi tàu.
+    if (cx + 34 > cabX && cx - 15 < cabX + cabW) continue;
+    if (cx + 34 > L - 40) continue;
+    // Tháp pháo hình vuông có nòng chĩa về mũi tàu, khác hẳn dấu chấm bắn trượt.
+    turrets += `<rect x="${cx - 11}" y="39" width="22" height="22" rx="3" fill="none" stroke="${ink}" stroke-width="6"/><path d="M${cx + 11} 50 H${cx + 30}" stroke="${ink}" stroke-width="6"/>`;
   }
   const body = `<path d="${hull}" fill="${fill}" stroke="#111" stroke-width="6"/>${cabin}${turrets}`;
   return dir === 'h'
@@ -115,7 +120,7 @@ function renderPlace(el, state, you, api, room) {
     <p class="hint">${left.length ? t('bs.next', { n: left[0] }) : t('bs.allPlaced')}</p>
     ${grid(size, 'place', (i) => `<button class="c" data-i="${i}"></button>`, shipsLayer(draft.ships, size))}
     <div class="tools">
-      <button class="small" data-act="dir">${draft.dir === 'h' ? '⇆ ' + t('bs.horizontal') : '⇅ ' + t('bs.vertical')}</button>
+      <button class="small" data-act="dir">${draft.dir === 'h' ? t('bs.horizontal') : t('bs.vertical')}</button>
       <button class="small" data-act="random">${t('bs.random')}</button>
       <button class="small" data-act="clear">${t('bs.clear')}</button>
       <button data-act="ready" ${left.length || you < 0 ? 'disabled' : ''}>${t('bs.ready')}</button>
