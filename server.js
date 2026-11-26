@@ -6,7 +6,7 @@ const games = require('./games');
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC = path.join(__dirname, 'public');
-const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml' };
+const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png' };
 
 // ---------- Phục vụ file tĩnh ----------
 const server = http.createServer((req, res) => {
@@ -16,7 +16,8 @@ const server = http.createServer((req, res) => {
   if (!file.startsWith(PUBLIC)) return res.writeHead(403).end();
   fs.readFile(file, (err, data) => {
     if (err) return res.writeHead(404).end('Not found');
-    res.writeHead(200, { 'Content-Type': (TYPES[path.extname(file)] || 'application/octet-stream') + '; charset=utf-8' });
+    const type = TYPES[path.extname(file)] || 'application/octet-stream';
+    res.writeHead(200, { 'Content-Type': type.startsWith('text/') ? type + '; charset=utf-8' : type });
     res.end(data);
   });
 });

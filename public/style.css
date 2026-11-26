@@ -13,7 +13,8 @@ main {
   padding: 24px 16px;
 }
 
-h1 { font-size: 24px; margin: 0 0 20px; text-align: center; }
+h1 { font-size: 24px; margin: 0 0 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+h1 .logo { width: 30px; height: 30px; }
 h2.subtitle { font-size: 17px; font-weight: 600; text-align: center; margin: -14px 0 16px; color: #555; }
 
 /* Chọn ngôn ngữ */

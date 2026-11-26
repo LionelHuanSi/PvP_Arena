@@ -1,4 +1,6 @@
-# PvP Arena
+<p align="center"><img src="public/logo.svg" width="96" alt="PvP Arena logo"></p>
+
+<h1 align="center">PvP Arena</h1>
 
 Play head-to-head games with a friend, right in the browser.
 
