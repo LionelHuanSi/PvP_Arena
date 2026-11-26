@@ -13,9 +13,12 @@ main {
   padding: 24px 16px;
 }
 
-h1 { font-size: 24px; margin: 0 0 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-h1 .logo { width: 30px; height: 30px; }
-h2.subtitle { font-size: 17px; font-weight: 600; text-align: center; margin: -14px 0 16px; color: #555; }
+h1 { margin: 0 0 16px; display: flex; justify-content: center; }
+h1 .logo { width: 150px; height: 150px; }
+/* Trong phòng chơi thu nhỏ logo để nhường chỗ cho bàn chơi. */
+body.in-room h1 { margin-bottom: 18px; }
+body.in-room h1 .logo { width: 72px; height: 72px; }
+h2.subtitle { font-size: 17px; font-weight: 600; text-align: center; margin: -10px 0 16px; color: #555; }
 
 /* Chọn ngôn ngữ */
 .lang { display: flex; justify-content: flex-end; gap: 2px; margin-bottom: 4px; }
@@ -35,6 +38,7 @@ h2.subtitle { font-size: 17px; font-weight: 600; text-align: center; margin: -14
 .bo span { display: flex; align-items: center; padding: 0 10px; border: 1px solid #999; border-right: none; font-weight: 700; background: #f2f2f2; }
 .bo input { margin-top: 0; }
 #code { text-transform: uppercase; }
+#code::placeholder { text-transform: none; }
 h2 { font-size: 16px; margin: 0 0 12px; }
 
 .muted { color: #777; font-size: 14px; margin: 0; }

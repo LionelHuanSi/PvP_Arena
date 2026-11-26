@@ -1,7 +1,10 @@
 import { t, LANGS, getLang, setLang, applyI18n } from '/i18n.js';
 
 const $ = (id) => document.getElementById(id);
-const show = (id) => ['lobby', 'room'].forEach((s) => ($(s).hidden = s !== id));
+const show = (id) => {
+  ['lobby', 'room'].forEach((s) => ($(s).hidden = s !== id));
+  document.body.classList.toggle('in-room', id === 'room');
+};
 
 let ws;
 let gamesList = [];
