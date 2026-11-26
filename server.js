@@ -17,7 +17,11 @@ const server = http.createServer((req, res) => {
   fs.readFile(file, (err, data) => {
     if (err) return res.writeHead(404).end('Not found');
     const type = TYPES[path.extname(file)] || 'application/octet-stream';
-    res.writeHead(200, { 'Content-Type': type.startsWith('text/') ? type + '; charset=utf-8' : type });
+    res.writeHead(200, {
+      'Content-Type': type.startsWith('text/') ? type + '; charset=utf-8' : type,
+      // Không cho trình duyệt hay Cloudflare giữ bản cũ, để mỗi lần sửa code là thấy ngay.
+      'Cache-Control': 'no-store',
+    });
     res.end(data);
   });
 });

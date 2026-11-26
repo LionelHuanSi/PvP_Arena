@@ -186,9 +186,25 @@ $('create').onclick = () => {
   document.querySelectorAll('[data-opt]').forEach((el) => (options[el.dataset.opt] = el.checked));
   sendMsg({ type: 'create', game: $('game').value, name: myName(), bo: oddBo($('bo').value), options });
 };
-$('join').onclick = () => sendMsg({ type: 'join', code: $('code').value.trim().toUpperCase(), name: myName() });
+$('join').onclick = () => sendMsg({ type: 'join', code: cleanCode($('code').value), name: myName() });
+// Làm sạch mã phòng: nhận cả link mời, bỏ dấu tiếng Việt, chỉ giữ chữ và số, tối đa 4 ký tự.
+function cleanCode(v) {
+  const fromLink = v.match(/[?&]room=([A-Za-z0-9]+)/);
+  if (fromLink) v = fromLink[1];
+  return v.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'D')
+    .replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 4);
+}
+let composing = false;
+$('code').addEventListener('compositionstart', () => (composing = true));
+$('code').addEventListener('compositionend', () => {
+  composing = false;
+  $('code').value = cleanCode($('code').value);
+});
+$('code').addEventListener('input', () => {
+  if (!composing) $('code').value = cleanCode($('code').value);
+});
 $('code').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') $('join').click();
+  if (e.key === 'Enter' && !e.isComposing) $('join').click();
 });
 $('rematch').onclick = () => sendMsg({ type: 'rematch' });
 $('leave').onclick = () => {
