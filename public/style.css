@@ -282,3 +282,85 @@ label.check input { width: auto; margin: 0; }
 .tools button { line-height: 1.2; }
 .tools button[data-act="dir"] { min-width: 72px; }
 .tools button:last-child { margin-left: auto; }
+
+/* ---------- Bingo 5x5 ---------- */
+.bingo-prepare { margin: 12px 0; }
+.bingo-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; margin: 8px 0; }
+.bingo-meta span { color: #777; text-align: right; }
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1;
+  margin: 12px auto;
+  border: 2px solid #111;
+}
+.bingo-input-grid { gap: 0; background: #111; }
+.bingo-input-grid input {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #bbb;
+  border-radius: 0;
+  text-align: center;
+  font-size: clamp(18px, 7vw, 28px);
+  background: #fff;
+  color: #111;
+}
+.bingo-input-grid input:focus { outline: 3px solid #111; outline-offset: -3px; position: relative; z-index: 1; }
+.bingo-input-grid input.invalid { background: #ddd; color: #111; text-decoration: underline wavy #111; }
+.bingo-validation { min-height: 1.3em; margin: 6px 0; color: #555; font-size: 13px; }
+.bingo-validation.ok { color: #111; font-weight: 600; }
+.bingo-scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+.bingo-scoreboard > div { border: 1px solid #ccc; padding: 8px; text-align: center; }
+.bingo-scoreboard > div > span { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.bingo-progress { display: flex; justify-content: center; gap: 4px; }
+.bingo-progress span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #999;
+  color: #999;
+  font-size: 13px;
+  font-weight: 700;
+}
+.bingo-progress span.done { background: #111; border-color: #111; color: #fff; }
+.bingo-panel { margin: 12px 0 18px; }
+.bingo-panel .sea-title { display: flex; justify-content: space-between; }
+.bingo-board { margin-top: 6px; }
+.bingo-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid #bbb;
+  border-radius: 0;
+  background: #fff;
+  color: #111;
+  font-size: clamp(17px, 6vw, 28px);
+  font-weight: 600;
+  cursor: default;
+}
+button.bingo-cell { border-color: #bbb; }
+button.bingo-cell:hover:not(:disabled) { background: #eee; }
+.bingo-cell.marked { background: #ddd; text-decoration: line-through; }
+.bingo-cell.complete { background: #111; border-color: #fff; color: #fff; }
+.bingo-cell.marked.complete { background: #111; color: #fff; }
+.bingo-cell.last { box-shadow: inset 0 0 0 3px #777; }
+.bingo-cell.pop { animation: pop 0.25s ease-out; }
+.bingo-private { color: #777; font-size: 13px; text-align: center; margin: 4px 0 16px; }
+.bingo-history { margin: 16px 0; }
+.bingo-history-list { display: flex; flex-wrap: wrap; gap: 5px; }
+.bingo-history-list span { min-width: 34px; padding: 4px 6px; border: 1px solid #ccc; text-align: center; font-size: 13px; }
+
+@media (max-width: 360px) {
+  .bingo-meta { display: block; }
+  .bingo-meta span { display: block; text-align: left; margin-top: 4px; }
+  .bingo-progress span { width: 21px; height: 21px; }
+}
