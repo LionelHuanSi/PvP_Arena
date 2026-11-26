@@ -4,7 +4,8 @@
   "description": "Chơi game đối kháng online với bạn bè qua WebSocket",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "dependencies": {
     "ws": "^8.18.0"

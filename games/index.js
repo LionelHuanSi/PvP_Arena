@@ -6,6 +6,7 @@ const list = [
   require('./rps'),
   require('./bang'),
   require('./battleship'),
+  require('./bingo'),
 ];
 
 module.exports = Object.fromEntries(list.map((g) => [g.id, g]));
